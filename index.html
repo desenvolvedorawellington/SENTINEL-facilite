@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assistente Virtual - Sentinel Facilities</title>
+  <style>
+    :root {
+      --azul-verificado: #0075ff;
+      --cinza: #f4f4f4;
+      --preto: #1a1a1a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: url('fundo-wolf.png') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      color: var(--preto);
+    }
+
+    header {
+      background: var(--cinza);
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      border-bottom: 2px solid var(--azul-verificado);
+    }
+
+    .logo-container {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-right: 10px;
+    }
+
+    .logo-container::before {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      width: calc(100% + 6px);
+      height: calc(100% + 6px);
+      border-radius: 20px;
+      background: conic-gradient(from 0deg, #ccc, #fff, #999, #ccc);
+      z-index: 0;
+      animation: rotateBorder 4s linear infinite;
+      mask: radial-gradient(circle, rgba(0,0,0,0) 70%, rgba(0,0,0,1) 71%);
+    }
+
+    .logo-container img {
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      object-fit: cover;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+
+    header .title {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    header .title strong {
+      font-size: 1.2rem;
+      color: var(--preto);
+    }
+
+    header .title span {
+      font-size: 0.9rem;
+      color: #444;
+    }
+
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 0.8rem;
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      animation: fadeIn 0.3s ease;
+      line-height: 1.5;
+    }
+
+    .bot {
+      background: var(--cinza);
+      align-self: flex-start;
+    }
+
+    .user {
+      background: var(--azul-verificado);
+      color: white;
+      align-self: flex-end;
+    }
+
+    .typing {
+      font-style: italic;
+      opacity: 0.6;
+      padding: 0.6rem 1rem;
+      background: #eee;
+      border-radius: 10px;
+      width: fit-content;
+      animation: blink 1s infinite;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes blink {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes rotateBorder {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .input-area {
+      display: flex;
+      padding: 0.8rem;
+      border-top: 1px solid #ddd;
+      background: white;
+    }
+
+    .input-area input {
+      flex: 1;
+      padding: 1rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      outline: none;
+    }
+
+    .input-area button {
+      margin-left: 0.5rem;
+      background: var(--azul-verificado);
+      border: none;
+      color: white;
+      padding: 0.9rem 1.2rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    footer {
+      background: #f9f9f9;
+      padding: 0.5rem;
+      font-size: 0.72rem;
+      color: #333;
+    }
+
+    footer .footer-columns {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: nowrap;
+      gap: 1rem;
+    }
+
+    footer .footer-columns div {
+      flex: 1;
+    }
+
+    footer .cnpj {
+      text-align: center;
+      margin-top: 0.5rem;
+      font-size: 0.72rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <img src="logo-wolf.png" alt="Logo Sentinel Facilities">
+    </div>
+    <div class="title">
+      <strong>WOLF</strong>
+      <span>Assistente Virtual da Sentinel Facilities ✅</span>
+    </div>
+  </header>
+
+  <div class="chat-box" id="chat"></div>
+
+  <div class="input-area">
+    <input type="text" id="userInput" placeholder="Digite aqui..." />
+    <button onclick="sendMessage()">Enviar</button>
+  </div>
+
+  <footer>
+    <div class="footer-columns">
+      <div>
+        <strong>DISTRITO FEDERAL</strong><br>
+        📞 (61) 99668-1574<br>
+        📩 comercial@sentinefacilities.com.br<br>
+        📍 Brasília<br>
+        📬 QSC 19, Chácara 25, Conjunto E, nº 14 – Brasília / DF
+      </div>
+      <div>
+        <strong>GOIÁS</strong><br>
+        📞 (61) 99324-9005<br>
+        📩 comercial@sentinefacilities.com.br<br>
+        📍 Senador Canedo
+      </div>
+      <div>
+        <strong>RIO DE JANEIRO</strong><br>
+        📞 (21) 99149-8831<br>
+        📩 comercial@sentinefacilities.com.br<br>
+        📍 Paracambi
+      </div>
+    </div>
+    <div class="cnpj">
+      📎 <strong>CNPJ:</strong> 46.900.875/0001-40
+    </div>
+  </footer>
+
+  <script>
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('userInput');
+    let etapa = -1;
+    let nome = '';
+    let unidade = '';
+
+    function startConversation() {
+      showTyping(() => appendMessage("👋 Olá! Sou WOLF, assistente virtual da Sentinel Facilities.", 'bot'));
+      setTimeout(() => showTyping(() => {
+        appendMessage("Me informe qual seu nome?", 'bot');
+        etapa = 0;
+      }), 2500);
+    }
+
+    function sendMessage() {
+      const texto = input.value.trim();
+      if (!texto) return;
+      appendMessage(texto, 'user');
+      input.value = '';
+      setTimeout(() => showTyping(() => responder(texto)), 300);
+    }
+
+    function appendMessage(texto, tipo) {
+      const msg = document.createElement('div');
+      msg.className = 'message ' + tipo;
+      msg.innerHTML = texto;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function showTyping(callback) {
+      const typing = document.createElement('div');
+      typing.className = 'typing';
+      typing.innerText = 'Digitando...';
+      chat.appendChild(typing);
+      chat.scrollTop = chat.scrollHeight;
+      setTimeout(() => {
+        typing.remove();
+        callback();
+      }, 2000);
+    }
+
+    function responder(texto) {
+      if (etapa === 0) {
+        nome = texto;
+        appendMessage(`Muito prazer, ${nome}! 😊<br><br>Antes de começarmos, me diga de qual unidade você deseja atendimento:<br><br>
+        ✳️ Digite: <strong>DF</strong> para Distrito Federal<br>
+        ✳️ Digite: <strong>GO</strong> para Goiás<br>
+        ✳️ Digite: <strong>RJ</strong> para Rio de Janeiro`, 'bot');
+        etapa = 1;
+      } else if (etapa === 1) {
+        const estado = texto.trim().toUpperCase();
+        if (!['DF', 'GO', 'RJ'].includes(estado)) {
+          appendMessage(`❗ Por favor, informe uma das siglas válidas: DF, GO ou RJ.`, 'bot');
+          return;
+        }
+        unidade = estado;
+        appendMessage(`✅ Unidade selecionada: <strong>${estado === 'DF' ? 'Distrito Federal' : estado === 'GO' ? 'Goiás' : 'Rio de Janeiro'}</strong>.<br><br>Agora, escolha uma opção de atendimento:<br><br>
+          1️⃣ - Solicitar Orçamento / Contratar Serviços<br>
+          2️⃣ - Atendimento a Clientes (Suporte Operacional)<br>
+          3️⃣ - Assuntos Financeiros<br>
+          4️⃣ - Trabalhe Conosco (Envio de Currículo)<br>
+          5️⃣ - Dados da Empresa / Localização<br>
+          6️⃣ - Falar com a Gerência<br>
+          7️⃣ - Outros Assuntos`, 'bot');
+        etapa = 2;
+      } else if (etapa === 2) {
+        if (texto === '5') {
+          mostrarDadosDaUnidade(unidade);
+          etapa = 3;
+          return;
+        }
+
+        const destino = {
+          '1': 'comercial@sentinefacilities.com.br',
+          '2': 'contato@sentinefacilities.com.br',
+          '3': 'financeiro@sentinefacilities.com.br',
+          '4': 'gerencia@sentinefacilities.com.br',
+          '6': 'gerencia@sentinefacilities.com.br',
+          '7': 'contato@sentinefacilities.com.br'
+        }[texto];
+
+        if (!destino) {
+          mostrarOpcoes();
+          return;
+        }
+
+        let assunto = '';
+        let corpo = `Olá, meu nome é ${encodeURIComponent(nome)}. Gostaria de ajuda com o assunto selecionado.`;
+
+        switch (texto) {
+          case '1': assunto = 'Solicitação de Orçamento'; break;
+          case '2': assunto = 'Suporte Operacional'; break;
+          case '3': assunto = 'Assuntos Financeiros'; break;
+          case '4': assunto = 'Trabalhe Conosco'; break;
+          case '6': assunto = 'Falar com a Gerência'; break;
+          case '7': assunto = 'Outros Assuntos'; break;
+        }
+
+        const mailtoLink = `mailto:${destino}?subject=${encodeURIComponent(assunto)}&body=${corpo}`;
+
+        appendMessage(`✅ Este é o nosso e-mail do setor selecionado:<br><a href="${mailtoLink}" target="_blank">${destino}</a>`, 'bot');
+        appendMessage(`<a class="button" href="${mailtoLink}" target="_blank">📩 Enviar E-mail</a>`, 'bot');
+        etapa = 3;
+      } else {
+        mostrarOpcoes();
+      }
+    }
+
+    function mostrarOpcoes() {
+      appendMessage(`Em que posso te ajudar hoje? Digite o número da opção:<br><br>
+        1️⃣ - Solicitar Orçamento / Contratar Serviços<br>
+        2️⃣ - Atendimento a Clientes (Suporte Operacional)<br>
+        3️⃣ - Assuntos Financeiros<br>
+        4️⃣ - Trabalhe Conosco (Envio de Currículo)<br>
+        5️⃣ - Dados da Empresa / Localização<br>
+        6️⃣ - Falar com a Gerência<br>
+        7️⃣ - Outros Assuntos`, 'bot');
+      etapa = 2;
+    }
+
+    function mostrarDadosDaUnidade(estado) {
+      let mensagem = '📍 <strong>Dados da Empresa / Localização:</strong><br><br>';
+      if (estado === 'DF') {
+        mensagem += `<strong>📌 DISTRITO FEDERAL</strong><br>
+        📞 (61) 99668-1574<br>
+        📩 comercial@sentinefacilities.com.br<br>
+        📍 Brasília<br>
+        📬 Endereço: QSC 19, Chácara 25, Conjunto E, nº 14 – Brasília / DF<br><br>`;
+      } else if (estado === 'GO') {
+        mensagem += `<strong>📌 GOIÁS</strong><br>
+        📞 (61) 99324-9005<br>
+        📩 comercial@sentinefacilities.com.br<br>
+        📍 Senador Canedo<br><br>`;
+      } else if (estado === 'RJ') {
+        mensagem += `<strong>📌 RIO DE JANEIRO</strong><br>
+        📞 (21) 99149-8831<br>
+        📩 comercial@sentinefacilities.com.br<br>
+        📍 Paracambi<br><br>`;
+      }
+      mensagem += `<strong>📎 CNPJ:</strong> 46.900.875/0001-40`;
+      appendMessage(mensagem, 'bot');
+    }
+
+    window.onload = startConversation;
+  </script>
+</body>
+</html>
